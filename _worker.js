@@ -80,5 +80,35 @@ function extractLinks(decodedContent) {
         links[0] = modifiedFirstLink;  // 更新排在最前面的链接
     }
 
-    return links;
+    // 删除所有 #PL 的 IP
+    const filteredLinks = links.filter(link => !link.includes('#PL'));
+
+    // 将每个国家的 IP 随机删除一半
+    const countryMap = {};
+
+    // 将过滤后的链接按国家分组
+    filteredLinks.forEach(link => {
+        const country = link.split('#')[1];
+        if (!countryMap[country]) {
+            countryMap[country] = [];
+        }
+        countryMap[country].push(link);
+    });
+
+    // 对每个国家的 IP 随机删除一半
+    const finalLinks = [];
+    Object.keys(countryMap).forEach(country => {
+        const countryLinks = countryMap[country];
+        const randomSelection = randomSelectHalf(countryLinks);
+        finalLinks.push(...randomSelection);
+    });
+
+    return finalLinks;
+}
+
+// 随机选择一半的 IP
+function randomSelectHalf(arr) {
+    const shuffled = arr.sort(() => 0.5 - Math.random()); // 打乱顺序
+    const half = Math.floor(shuffled.length / 2); // 计算一半的数量
+    return shuffled.slice(0, half); // 返回前一半
 }
