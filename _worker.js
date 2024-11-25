@@ -22,6 +22,8 @@ export default {
 
     // 对每个 URL 执行提取操作
     for (const url of urlList) {
+      console.log(`Fetching URL: ${url}`);  // 输出正在获取的 URL
+
       const base64Data = await fetch(url).then(res => res.text()).catch(err => {
         console.error("Failed to fetch the content from", url, ":", err);
         return null;
@@ -32,16 +34,16 @@ export default {
         continue;  // 如果获取失败，跳过当前 URL
       }
 
+      console.log(`Fetched content for ${url}:`, base64Data); // 打印获取的内容
+
       let decodedContent;
       try {
-        decodedContent = atob(base64Data);
+        decodedContent = atob(base64Data);  // 解码 base64 内容
+        console.log(`Decoded content for ${url}:`, decodedContent);  // 打印解码后的内容
       } catch (e) {
         console.error("Failed to decode the content from", url, ":", e);
         continue;  // 如果解码失败，跳过当前 URL
       }
-
-      console.log("Decoded content for URL:", url);
-      console.log(decodedContent); // 打印解码后的内容
 
       const links = extractLinks(decodedContent);
       console.log("Extracted links:", links); // 打印提取到的链接
