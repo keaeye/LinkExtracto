@@ -1,7 +1,7 @@
 export default {
     async fetch(请求, env) {
         // 获取环境变量 URL
-        const url = env.网站;
+        const url = env.URL;
 
         if (!url) {
         // 如果 URL 未设置，返回提示信息
