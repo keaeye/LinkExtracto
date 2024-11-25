@@ -110,26 +110,17 @@ function extractLinks(decodedContent) {
 
 // 提取国家部分（包括#后面的复杂文字）
 function extractCountry(countryCode) {
-    const countryRegex = /#([^#]+)/;
-    const match = countryCode.match(countryRegex);
-    if (match) {
-        let country = match[1];
-        if (isChinese(country)) {
-            country = translateToEnglish(country);
-        }
-        return country;
-    }
-    return countryCode; // 如果没有找到，返回原始的国家部分
-}
+    // 检查是否为英文或中文国家名
+    const englishCountries = {
+        "US": "USA",
+        "Singapore": "Singapore",
+        "UK": "UK",
+        "China": "China",
+        "Japan": "Japan",
+        "India": "India"
+    };
 
-// 判断是否为中文
-function isChinese(text) {
-    return /[\u4e00-\u9fa5]/.test(text);
-}
-
-// 将中文翻译为英文（假设只处理部分常见国家名）
-function translateToEnglish(chinese) {
-    const translations = {
+    const chineseCountries = {
         "美国": "USA",
         "新加坡": "Singapore",
         "英国": "UK",
@@ -137,7 +128,19 @@ function translateToEnglish(chinese) {
         "日本": "Japan",
         "印度": "India"
     };
-    return translations[chinese] || chinese;
+
+    // 先判断是否是中文，如果是则翻译成英文
+    if (isChinese(countryCode)) {
+        return chineseCountries[countryCode] || countryCode;  // 默认返回原始中文
+    }
+
+    // 如果是英文国家名，直接返回
+    return englishCountries[countryCode] || countryCode;
+}
+
+// 判断是否为中文
+function isChinese(text) {
+    return /[\u4e00-\u9fa5]/.test(text);
 }
 
 // 随机选择一半的 IP
