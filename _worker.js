@@ -4,14 +4,15 @@ export default {
         const url = env.URL;
 
         if (!url) {
-        // 如果 URL 未设置，返回提示信息
-        return new Response(
-            "You have not set the URL. 请填写 URL 以便提取数据。",
-            {
-                headers: { 'Content-Type': 'text/plain; charset=utf-8' } // 设置UTF-8编码
-            }
-        );
-    }
+            // 如果 URL 未设置，返回提示信息
+            return new Response(
+                "You have not set the URL. 请填写 URL 以便提取数据。",
+                {
+                    headers: { 'Content-Type': 'text/plain; charset=utf-8' } // 设置UTF-8编码
+                }
+            );
+        }
+
         // 获取 base64 编码内容
         const base64Data = await fetch(url).then(res => res.text()).catch(err => {
             console.error("Failed to fetch the content:", err);
@@ -52,12 +53,19 @@ function extractLinks(decodedContent) {
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^%]+)%F0%9F%90%B2/g;
     const links = [];
     let match;
+    let firstLinkModified = false;  // 标记是否修改了第一行
 
     // 遍历所有匹配的 vless 链接
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];  // 提取 IP 地址
         const port = match[3]; // 提取端口号
-        const countryCode = decodeURIComponent(match[5]); // 提取国家代码，并解码
+        let countryCode = decodeURIComponent(match[5]); // 提取国家代码，并解码
+
+        // 如果是第一行，将国家代码修改为 "Keaeye提供"
+        if (!firstLinkModified) {
+            countryCode = "Keaeye提供";
+            firstLinkModified = true;
+        }
 
         // 格式化输出：IP:PORT#COUNTRY_CODE
         const formattedLink = `${ip}:${port}#${countryCode}`;
