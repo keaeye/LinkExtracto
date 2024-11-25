@@ -90,6 +90,9 @@ function extractLinks(decodedContent) {
             }
         }
 
+        // 清理掉多余的字符，只保留国家名称
+        countryCode = countryCode.replace(/[^\w\u4e00-\u9fa5]/g, '');
+
         // 获取格式化链接并加上国家代码
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
