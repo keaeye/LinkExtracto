@@ -13,6 +13,7 @@ export default {
 
         let allLinks = [];
         for (const url of urls) {
+            console.log(`Fetching URL: ${url}`);  // 输出正在处理的 URL
             const base64Data = await fetch(url).then(res => res.text()).catch(err => {
                 console.error(`Failed to fetch from ${url}:`, err);
                 return null;
@@ -22,9 +23,12 @@ export default {
                 continue;
             }
 
+            console.log(`Base64 Data: ${base64Data}`);  // 输出获取的 base64 数据
+
             let decodedContent;
             try {
                 decodedContent = atob(base64Data);
+                console.log(`Decoded Content: ${decodedContent}`);  // 输出 base64 解码后的内容
             } catch (e) {
                 console.error("Failed to decode the content:", e);
                 continue;
@@ -32,11 +36,13 @@ export default {
 
             // Step 2: Decode URL-encoded parts (e.g., %E6%B5%8B%E8%AF%95)
             decodedContent = decodeURIComponent(decodedContent);
+            console.log(`Decoded Content (URL-decoded): ${decodedContent}`);  // 输出 URL 解码后的内容
 
             const links = extractLinks(decodedContent);
 
             if (links.length > 0) {
                 allLinks = allLinks.concat(links);
+                console.log(`Found Links: ${links}`);  // 输出找到的链接
             }
         }
 
@@ -45,6 +51,7 @@ export default {
         }
 
         const plainTextContent = allLinks.join('\n');
+        console.log(`Final Links: ${plainTextContent}`);  // 输出最终的链接内容
 
         return new Response(plainTextContent, {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -57,17 +64,23 @@ function extractLinks(decodedContent) {
     const links = [];
     let match;
 
+    console.log("Extracting links from decoded content...");
+
     while ((match = regex.exec(decodedContent)) !== null) {
+        console.log(`Match found: ${match}`);  // 输出每次正则匹配的结果
         const ip = match[2];
         const port = match[3];
         let countryCode = decodeURIComponent(match[5]); // Ensure the country part is URL-decoded
 
         // 识别国家文字部分
         countryCode = extractCountry(countryCode);
+        console.log(`Extracted country code: ${countryCode}`);  // 输出提取的国家代码
 
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
     }
+
+    console.log(`Extracted Links: ${links}`);  // 输出提取的所有链接
 
     // 按照国家代码排序
     links.sort((a, b) => {
@@ -78,6 +91,7 @@ function extractLinks(decodedContent) {
 
     // 删除 #PL 的 IP
     const filteredLinks = links.filter(link => !link.includes('#PL'));
+    console.log(`Filtered Links (excluding #PL): ${filteredLinks}`);
 
     // 随机删除每个国家一半的 IP
     const countryMap = {};
@@ -105,21 +119,14 @@ function extractLinks(decodedContent) {
         finalLinks[0] = modifiedFirstLink;
     }
 
+    console.log(`Final Processed Links: ${finalLinks}`);  // 输出最终处理后的链接
+
     return finalLinks;
 }
 
 // 提取国家部分（包括#后面的复杂文字）
 function extractCountry(countryCode) {
-    // 检查是否为英文或中文国家名
-    const englishCountries = {
-        "US": "USA",
-        "Singapore": "Singapore",
-        "UK": "UK",
-        "China": "China",
-        "Japan": "Japan",
-        "India": "India"
-    };
-
+    // 中文到英文的国家名映射
     const chineseCountries = {
         "美国": "USA",
         "新加坡": "Singapore",
@@ -129,13 +136,14 @@ function extractCountry(countryCode) {
         "印度": "India"
     };
 
-    // 先判断是否是中文，如果是则翻译成英文
+    // 如果是中文国家名，则转换为英文
     if (isChinese(countryCode)) {
+        console.log(`Country code is Chinese: ${countryCode}`);  // 输出中文国家代码
         return chineseCountries[countryCode] || countryCode;  // 默认返回原始中文
     }
 
-    // 如果是英文国家名，直接返回
-    return englishCountries[countryCode] || countryCode;
+    // 如果已经是英文国家代码，直接返回
+    return countryCode;
 }
 
 // 判断是否为中文
