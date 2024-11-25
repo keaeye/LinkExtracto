@@ -52,17 +52,45 @@ async function fetchLinks(url) {
 function extractLinks(decodedContent) {
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^\n]+)/g;
     const links = [];
+    const countryMapping = {
+        "香港": "香港",
+        "韩国": "韩国",
+        "台湾": "台湾",
+        "日本": "日本",
+        "新加坡": "新加坡",
+        "美国": "美国",
+        "加拿大": "加拿大",
+        "澳大利亚": "澳大利亚",
+        "英国": "英国",
+        "法国": "法国",
+        "意大利": "意大利",
+        "荷兰": "荷兰",
+        "德国": "德国",
+        "挪威": "挪威",
+        "芬兰": "芬兰",
+        "瑞典": "瑞典",
+        "丹麦": "丹麦",
+        "立陶宛": "立陶宛",
+        "俄罗斯": "俄罗斯",
+        "印度": "印度",
+        "土耳其": "土耳其"
+    };
+    
     let match;
-
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
         const port = match[3];
-        let countryCode = match[5];  // 获取国家代码
+        let countryCode = match[5];
 
-        // 移除国家代码后的所有内容（包括表情、特殊字符等）
-        countryCode = countryCode.replace(/[^a-zA-Z0-9]/g, '');
+        // 映射国家
+        for (let country in countryMapping) {
+            if (countryCode.includes(country)) {
+                countryCode = countryMapping[country];
+                break;
+            }
+        }
 
-        // 格式化链接，只有有效的国家代码部分
+        // 获取格式化链接并加上国家代码
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
     }
