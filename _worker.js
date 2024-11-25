@@ -55,7 +55,6 @@ function extractLinks(decodedContent) {
         '新西兰': 'NZ',
         '冰岛': 'IS',
         '爱尔兰': 'IE',
-        '新西兰': 'NZ',
         '智利': 'CL',
         '秘鲁': 'PE',
         '哥伦比亚': 'CO',
@@ -78,16 +77,11 @@ function extractLinks(decodedContent) {
         '黎巴嫩': 'LB',
         '阿曼': 'OM',
         '斯里兰卡': 'LK',
-        '孟加拉': 'BD',
         '马尔代夫': 'MV',
         '尼泊尔': 'NP',
-        '马来西亚': 'MY',
-        '新加坡': 'SG',
         '柬埔寨': 'KH',
         '老挝': 'LA',
-        '缅甸': 'MM',
-        '泰国': 'TH',
-        '越南': 'VN'
+        '缅甸': 'MM'
     };
 
     while ((match = regex.exec(decodedContent)) !== null) {
@@ -103,13 +97,6 @@ function extractLinks(decodedContent) {
         const formattedLink = `${ip}:${port}#${country}`;
         links.push(formattedLink);
     }
-
-    // 按照国家代码排序
-    links.sort((a, b) => {
-        const countryA = a.split('#')[1];
-        const countryB = b.split('#')[1];
-        return countryA.localeCompare(countryB);
-    });
 
     // 删除 #PL 的 IP
     const filteredLinks = links.filter(link => !link.includes('#PL'));
@@ -132,17 +119,30 @@ function extractLinks(decodedContent) {
         finalLinks.push(...randomSelection);
     });
 
+    // 去重，确保没有重复的 IP
+    const uniqueLinks = [...new Set(finalLinks)];
+
+    // 按照国家代码排序
+    uniqueLinks.sort((a, b) => {
+        const countryA = a.split('#')[1];
+        const countryB = b.split('#')[1];
+        return countryA.localeCompare(countryB);
+    });
+
     // 将第一行的国家代码替换为 "Keaeye提供"
-    if (finalLinks.length > 0) {
-        const firstLink = finalLinks[0];
+    if (uniqueLinks.length > 0) {
+        const firstLink = uniqueLinks[0];
         const firstLinkParts = firstLink.split('#');
         const modifiedFirstLink = `${firstLinkParts[0]}#Keaeye提供`;
-        finalLinks[0] = modifiedFirstLink;
+        uniqueLinks[0] = modifiedFirstLink;
     }
 
-    return finalLinks;
+    return uniqueLinks;
 }
 
 // 随机选择一半的 IP
 function randomSelectHalf(arr) {
-    const shuffled = arr.sort(() => 
+    const shuffled = arr.sort(() => 0.5 - Math.random());
+    const halfIndex = Math.floor(shuffled.length / 2);
+    return shuffled.slice(0, halfIndex);
+}
