@@ -4,8 +4,14 @@ export default {
         const url = env.网站;
 
         if (!url) {
-            return new Response("Environment variable 'URL' is not set.", { status: 500 });
-        }
+        // 如果 URL 未设置，返回提示信息
+        return new Response(
+            "You have not set the URL. 请填写 URL 以便提取数据。",
+            {
+                headers: { 'Content-Type': 'text/plain' }
+            }
+        );
+    }
 
         // 获取 base64 编码内容
         const base64Data = await fetch(url).then(res => res.text()).catch(err => {
