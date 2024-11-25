@@ -20,6 +20,11 @@ export default {
         // 按国家分组，随机取一半
         const selectedLinks = selectRandomHalfByCountry(validLinks);
 
+        // 替换第一行的 #国家代码 为 #Keaeye提供
+        if (selectedLinks.length > 0) {
+            selectedLinks[0] = selectedLinks[0].replace(/#\w+$/, "#Keaeye提供");
+        }
+
         const plainTextContent = selectedLinks.join('\n');
         return new Response(plainTextContent + "\n", {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
