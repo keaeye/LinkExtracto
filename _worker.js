@@ -1,5 +1,5 @@
 export default {
-    async fetch(请求, env) {
+    async fetch(request, env) {
         let debugInfo = "";  // 用于保存调试信息
         debugInfo += "Fetching URLs...\n";
 
