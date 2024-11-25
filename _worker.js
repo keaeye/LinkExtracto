@@ -93,7 +93,7 @@ function extractLinks(decodedContent) {
         // 去除多余字符，保留国家名称
         countryCode = countryCode.replace(/[^\w\u4e00-\u9fa5]/g, ''); // 去除符号和其他非字母、数字字符
 
-        // 去除 # 后的多余文字
+        // 删除 # 后的多余内容，只保留国家代码
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
         links.push(formattedLink);
