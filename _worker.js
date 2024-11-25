@@ -17,7 +17,10 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
-        const plainTextContent = validLinks.join('\n');
+        // 按照国家顺序排序
+        const sortedLinks = sortLinksByCountry(validLinks);
+
+        const plainTextContent = sortedLinks.join('\n');
         return new Response(plainTextContent + "\n", {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
         });
@@ -96,9 +99,21 @@ function extractLinks(decodedContent) {
         // 形成格式化的链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
-        links.push(formattedLink);
+        links.push({ link: formattedLink, countryCode: countryCode });
     }
 
     // 过滤无效的链接，确保是有效的 IP 地址格式
-    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.split('#')[0]));
+    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
+}
+
+// 按国家顺序排序链接
+function sortLinksByCountry(links) {
+    const countryOrder = [
+        "HK", "KR", "TW", "JP", "SG", "US", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
+        "FI", "SE", "DK", "LT", "RU", "IN", "TR"
+    ];
+
+    return links.sort((a, b) => {
+        return countryOrder.indexOf(a.countryCode) - countryOrder.indexOf(b.countryCode);
+    }).map(linkObj => linkObj.link);
 }
