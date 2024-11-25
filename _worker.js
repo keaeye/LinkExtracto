@@ -8,11 +8,10 @@ export default {
         return new Response(
             "You have not set the URL. 请填写 URL 以便提取数据。",
             {
-                headers: { 'Content-Type': 'text/plain' }
+                headers: { 'Content-Type': 'text/plain; charset=utf-8' } // 设置UTF-8编码
             }
         );
     }
-
         // 获取 base64 编码内容
         const base64Data = await fetch(url).then(res => res.text()).catch(err => {
             console.error("Failed to fetch the content:", err);
