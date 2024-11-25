@@ -57,21 +57,13 @@ function extractLinks(decodedContent) {
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
         const port = match[3];
-        let countryCode = match[5];
+        const countryCode = match[5];
 
-        // 打印调试信息
-        console.log(`Original country code: ${countryCode}`);
-
-        // 对国家信息进行优化，只保留主要部分
-        countryCode = countryCode.split(" ")[0]; // 只保留国家名部分
-
-        // 打印优化后的国家信息
-        console.log(`Optimized country code: ${countryCode}`);
-
-        // 格式化输出
+        // 构建格式化链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
     }
 
-    return links;
+    // 过滤无效的链接，确保是有效的 IP 地址格式
+    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.split('#')[0]));
 }
