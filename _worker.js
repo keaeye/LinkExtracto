@@ -1,5 +1,5 @@
 export default {
-    async fetch(请求, env) {
+    async fetch(request, env) {
         const url = env.URL;
 
         if (!url) {
@@ -28,13 +28,24 @@ export default {
             return new Response("Failed to decode the content", { status: 500 });
         }
 
-        const links = extractLinks(decodedContent);
+        // 按行分隔URL
+        const urls = decodedContent.split('\n');
 
-        if (links.length === 0) {
+        let allLinks = [];
+        
+        // 遍历每个 URL 提取信息
+        for (let url of urls) {
+            if (url.trim() !== '') {  // 忽略空行
+                const links = await extractLinks(url.trim());
+                allLinks = allLinks.concat(links);
+            }
+        }
+
+        if (allLinks.length === 0) {
             return new Response("No valid links found", { status: 500 });
         }
 
-        const plainTextContent = links.join('\n');
+        const plainTextContent = allLinks.join('\n');
 
         return new Response(plainTextContent, {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -42,12 +53,15 @@ export default {
     }
 };
 
-function extractLinks(decodedContent) {
+async function extractLinks(url) {
+    const response = await fetch(url);
+    const data = await response.text();
+
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^%]+)%F0%9F%90%B2/g;
     const links = [];
     let match;
 
-    while ((match = regex.exec(decodedContent)) !== null) {
+    while ((match = regex.exec(data)) !== null) {
         const ip = match[2];
         const port = match[3];
         let countryCode = decodeURIComponent(match[5]);
