@@ -8,11 +8,6 @@ LinkExtracto 是一个简单高效的工具，用于提取 Base64 编码内容�
 
 ---
 
-## 使用方法
-
-### 1. Fork 项目
-点击 [LinkExtracto](https://github.com/keaeye/linkextracto) 页面右上角的 **Fork** 按钮，将项目复制到您的 GitHub 仓库。
-
 ### 2. 部署到 Cloudflare Pages
 1. **登录 Cloudflare**  
    登录到 Cloudflare 管理控制台，进入 **Pages**。
@@ -31,7 +26,7 @@ LinkExtracto 是一个简单高效的工具，用于提取 Base64 编码内容�
 
 5. **配置环境变量**  
    在 **Environment variables** 部分，点击 **Add variable**：
-   - **变量名称（Name）**: `网站`
+   - **变量名称（Name）**: URL
    - **变量值（Value）**: 输入您的数据源链接，例如 `https://example.com/data/base64.txt`。
 
 6. **完成部署**  
@@ -43,7 +38,7 @@ LinkExtracto 是一个简单高效的工具，用于提取 Base64 编码内容�
    登录到 Cloudflare，选择 **Pages** 项目。
 
 2. **配置环境变量**  
-   点击 **设置** > **Environment variables**，找到 `网站` 变量。
+   点击 **设置** > **Environment variables**，找到变量名URL，值为你需要读取的网址。
 
 3. **更新变量值**  
    点击变量后面的 **编辑** 按钮，将新的数据源 URL 输入到 **Value** 字段中，并点击 **保存**。
@@ -52,3 +47,6 @@ LinkExtracto 是一个简单高效的工具，用于提取 Base64 编码内容�
    回到 **Deployments** 页面，点击 **Trigger Deploy** 按钮以触发新部署。完成后，页面将使用新的数据源 URL。
 
 ---
+### 访问和使用
+部署完成后，访问 Cloudflare Pages 分配的 URL或使用自定义域名，页面会以纯文本形式显示提取的内容。
+如有任何问题，请在 GitHub Issues 提交问题反馈！
