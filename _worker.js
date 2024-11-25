@@ -91,7 +91,7 @@ function extractLinks(decodedContent) {
         }
 
         // 去除#后面的特殊字符和文本
-        countryCode = countryCode.replace(/[^A-Za-z\u4e00-\u9fa5]/g, ''); // 只保留字母和中文字符
+        countryCode = countryCode.replace(/[^A-Za-z]/g, ''); // 只保留字母字符
 
         // 形成格式化的链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
