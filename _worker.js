@@ -52,6 +52,9 @@ export default {
 function extractLinks(decodedContent) {
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^%]+)%F0%9F%90%B2/g;
     const links = [];
+    const usLinks = [];  // 用于存储 #US 的链接
+    const otherLinks = [];  // 用于存储其他链接（不包括 #PL）
+
     let match;
     let firstLinkModified = false;  // 标记是否修改了第一行
 
@@ -67,10 +70,22 @@ function extractLinks(decodedContent) {
             firstLinkModified = true;
         }
 
-        // 格式化输出：IP:PORT#COUNTRY_CODE
         const formattedLink = `${ip}:${port}#${countryCode}`;
-        links.push(formattedLink);
+
+        // 如果是 #US，将其存入 usLinks 数组
+        if (countryCode === 'US') {
+            usLinks.push(formattedLink);
+        }
+        // 如果是 #PL，跳过该行
+        else if (countryCode === 'PL') {
+            continue;
+        }
+        // 其他链接存入 otherLinks 数组
+        else {
+            otherLinks.push(formattedLink);
+        }
     }
 
-    return links;
+    // 将 #US 链接移到最前面，再合并其他链接
+    return [...usLinks, ...otherLinks];
 }
