@@ -99,7 +99,10 @@ function extractLinks(decodedContent) {
         // 形成格式化的链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
-        links.push({ link: formattedLink, countryCode: countryCode });
+        // 只保留包含有效国家代码的链接
+        if (countryCode) {
+            links.push({ link: formattedLink, countryCode: countryCode });
+        }
     }
 
     // 过滤无效的链接，确保是有效的 IP 地址格式
@@ -109,7 +112,7 @@ function extractLinks(decodedContent) {
 // 按国家顺序排序链接
 function sortLinksByCountry(links) {
     const countryOrder = [
-        "HK", "KR", "TW", "JP", "SG", "US", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
+        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
         "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
