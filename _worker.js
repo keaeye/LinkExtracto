@@ -67,7 +67,7 @@ export default {
 };
 
 function extractLinks(decodedContent, debugInfo) {
-    const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^%]+)%F0%9F%90%B2/g;
+    const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^\n]+)/g;
     const links = [];
     let match;
 
@@ -139,7 +139,10 @@ function convertCountryCode(countryCode, debugInfo) {
         "英国": "UK",
         "中国": "China",
         "日本": "Japan",
-        "印度": "India"
+        "印度": "India",
+        "立陶宛": "Lithuania",
+        "俄罗斯": "Russia",
+        "土耳其": "Turkey"
     };
 
     // 如果是中文国家名称，转换为英文
