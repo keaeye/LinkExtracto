@@ -57,9 +57,12 @@ function extractLinks(decodedContent) {
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
         const port = match[3];
-        const countryCode = match[5];
+        let countryCode = match[5];
 
-        // 直接使用提取到的国家信息
+        // 对国家信息进行优化，只保留主要部分
+        countryCode = countryCode.split(" ")[0]; // 只保留国家名部分
+
+        // 格式化输出
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
     }
