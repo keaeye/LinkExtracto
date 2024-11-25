@@ -1,5 +1,5 @@
 export default {
-    async fetch(request, env) {
+    async fetch(请求, env) {
         let debugInfo = "";  // 用于保存调试信息
         debugInfo += "Fetching URLs...\n";
 
@@ -77,11 +77,7 @@ function extractLinks(decodedContent, debugInfo) {
         debugInfo += `Match found: ${match}\n`;  // 输出每次正则匹配的结果
         const ip = match[2];
         const port = match[3];
-        let countryCode = decodeURIComponent(match[5]); // Ensure the country part is URL-decoded
-
-        // 识别国家文字部分，中文转英文
-        countryCode = convertCountryCode(countryCode, debugInfo);
-        debugInfo += `Extracted country code: ${countryCode}\n`;  // 输出提取的国家代码
+        const countryCode = match[5];  // 保持原始国家代码，不进行转换
 
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
@@ -89,80 +85,6 @@ function extractLinks(decodedContent, debugInfo) {
 
     debugInfo += `Extracted Links: ${links}\n`;  // 输出提取的所有链接
 
-    // 按照国家代码排序
-    links.sort((a, b) => {
-        const countryA = a.split('#')[1];
-        const countryB = b.split('#')[1];
-        return countryA.localeCompare(countryB);
-    });
-
-    // 删除 #PL 的 IP
-    const filteredLinks = links.filter(link => !link.includes('#PL'));
-    debugInfo += `Filtered Links (excluding #PL): ${filteredLinks}\n`;
-
-    // 随机删除每个国家一半的 IP
-    const countryMap = {};
-
-    filteredLinks.forEach(link => {
-        const country = link.split('#')[1];
-        if (!countryMap[country]) {
-            countryMap[country] = [];
-        }
-        countryMap[country].push(link);
-    });
-
-    const finalLinks = [];
-    Object.keys(countryMap).forEach(country => {
-        const countryLinks = countryMap[country];
-        const randomSelection = randomSelectHalf(countryLinks);
-        finalLinks.push(...randomSelection);
-    });
-
-    // 将第一行的国家代码替换为 "Keaeye提供"
-    if (finalLinks.length > 0) {
-        const firstLink = finalLinks[0];
-        const firstLinkParts = firstLink.split('#');
-        const modifiedFirstLink = `${firstLinkParts[0]}#Keaeye提供`;
-        finalLinks[0] = modifiedFirstLink;
-    }
-
-    debugInfo += `Final Processed Links: ${finalLinks}\n`;  // 输出最终处理后的链接
-
-    return finalLinks;
-}
-
-// 转换中文国家名称为英文国家代码
-function convertCountryCode(countryCode, debugInfo) {
-    const chineseToEnglish = {
-        "美国": "USA",
-        "新加坡": "Singapore",
-        "英国": "UK",
-        "中国": "China",
-        "日本": "Japan",
-        "印度": "India",
-        "立陶宛": "Lithuania",
-        "俄罗斯": "Russia",
-        "土耳其": "Turkey"
-    };
-
-    // 如果是中文国家名称，转换为英文
-    if (isChinese(countryCode)) {
-        debugInfo += `Chinese country name detected: ${countryCode}\n`;
-        return chineseToEnglish[countryCode] || countryCode;  // 默认返回原始中文
-    }
-
-    // 如果已经是英文国家代码，直接返回
-    return countryCode;
-}
-
-// 判断是否为中文
-function isChinese(text) {
-    return /[\u4e00-\u9fa5]/.test(text);
-}
-
-// 随机选择一半的 IP
-function randomSelectHalf(arr) {
-    const shuffled = arr.sort(() => 0.5 - Math.random());
-    const half = Math.floor(shuffled.length / 2);
-    return shuffled.slice(0, half);
+    // 返回提取的链接
+    return links;
 }
