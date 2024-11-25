@@ -59,7 +59,7 @@ function extractLinks(decodedContent) {
         const port = match[3];
         const countryCode = match[5];  // 获取国家代码
 
-        // 获取格式化链接并加上国家代码
+        // 格式化链接，只保留国家代码
         const formattedLink = `${ip}:${port}#${countryCode}`;
         links.push(formattedLink);
     }
