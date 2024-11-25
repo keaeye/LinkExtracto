@@ -17,10 +17,10 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
-        // 按照国家顺序排序
-        const sortedLinks = sortLinksByCountry(validLinks);
+        // 按国家分组，随机取一半
+        const selectedLinks = selectRandomHalfByCountry(validLinks);
 
-        const plainTextContent = sortedLinks.join('\n');
+        const plainTextContent = selectedLinks.join('\n');
         return new Response(plainTextContent + "\n", {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
         });
@@ -100,7 +100,7 @@ function extractLinks(decodedContent) {
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
         // 只保留包含有效国家代码的链接
-        if (countryCode) {
+        if (countryCode && countryCode !== 'PL') {
             links.push({ link: formattedLink, countryCode: countryCode });
         }
     }
@@ -109,14 +109,44 @@ function extractLinks(decodedContent) {
     return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
 }
 
-// 按国家顺序排序链接
-function sortLinksByCountry(links) {
+// 按新的国家顺序排序链接，并随机选择一半
+function selectRandomHalfByCountry(links) {
     const countryOrder = [
         "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
         "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
-    return links.sort((a, b) => {
-        return countryOrder.indexOf(a.countryCode) - countryOrder.indexOf(b.countryCode);
-    }).map(linkObj => linkObj.link);
+    const groupedLinks = {};
+
+    // 分组链接
+    links.forEach(({ link, countryCode }) => {
+        if (!groupedLinks[countryCode]) {
+            groupedLinks[countryCode] = [];
+        }
+        groupedLinks[countryCode].push(link);
+    });
+
+    // 按国家排序并随机选一半
+    const result = [];
+    countryOrder.forEach(country => {
+        if (groupedLinks[country]) {
+            const linksForCountry = groupedLinks[country];
+            const halfCount = Math.ceil(linksForCountry.length / 2);
+
+            // 随机选择
+            const selectedLinks = shuffleArray(linksForCountry).slice(0, halfCount);
+            result.push(...selectedLinks);
+        }
+    });
+
+    return result;
+}
+
+// 洗牌算法随机打乱数组
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
