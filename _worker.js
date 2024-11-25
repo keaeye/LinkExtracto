@@ -1,5 +1,5 @@
 export default {
-    async fetch(请求, env) {
+    async fetch(request, env) {
         const urls = (env.URL || "").split("\n").map(url => url.trim()).filter(url => url !== "");
 
         if (urls.length === 0) {
@@ -30,7 +30,7 @@ async function fetchLinks(url) {
         base64Data = await fetch(url).then(res => res.text());
     } catch (err) {
         console.error(`Failed to fetch from ${url}:`, err);
-        return null;
+        return [];
     }
 
     if (!base64Data) {
@@ -92,6 +92,7 @@ function getCountryName(countryCode) {
         'NG': '尼日利亚',
         'AR': '阿根廷',
         'EG': '埃及',
+        'KR': '韩国',
         'SE': '瑞典',
         'NO': '挪威',
         'FI': '芬兰',
@@ -107,6 +108,8 @@ function getCountryName(countryCode) {
         'HU': '匈牙利',
         'CZ': '捷克',
         'RO': '罗马尼亚',
+        'SK': '斯洛伐克',
+        'BG': '保加利亚',
         'UA': '乌克兰',
         'IL': '以色列',
         'KW': '科威特',
@@ -114,6 +117,7 @@ function getCountryName(countryCode) {
         'QA': '卡塔尔',
         'AE': '阿联酋',
         'OM': '阿曼',
+        'KW': '科威特',
         'BD': '孟加拉',
         'LK': '斯里兰卡',
         'PK': '巴基斯坦',
@@ -123,6 +127,7 @@ function getCountryName(countryCode) {
         'MY': '马来西亚',
         'PH': '菲律宾',
         'ID': '印度尼西亚',
+        'SG': '新加坡',
         'PE': '秘鲁',
         'CL': '智利',
         'CO': '哥伦比亚',
@@ -141,6 +146,34 @@ function getCountryName(countryCode) {
         'JM': '牙买加',
         'HT': '海地',
         'BB': '巴巴多斯',
+        'LC': '圣卢西亚',
+        'TT': '特立尼达和多巴哥',
+        'KY': '开曼群岛',
+        'BM': '百慕大',
+        'GI': '直布罗陀',
+        'VG': '英属维尔京群岛',
+        'MS': '蒙特塞拉特',
+        'TC': '特克斯和凯科斯群岛',
+        'GG': '根西岛',
+        'IM': '马恩岛',
+        'JE': '泽西岛',
+        'MO': '澳门',
+        'MP': '北马里亚纳群岛',
+        'PW': '帕劳',
+        'FM': '密克罗尼西亚联邦',
+        'AS': '美属萨摩亚',
+        'GU': '关岛',
+        'HM': '赫德岛和麦克唐纳群岛',
+        'TK': '托克劳',
+        'TV': '图瓦卢',
+        'WF': '瓦利斯和富图纳',
+        'PF': '法属波利尼西亚',
+        'NC': '新喀里多尼亚',
+        'YT': '马约特',
+        'MQ': '马提尼克',
+        'GF': '法属圭亚那',
+        'GP': '瓜德罗普',
+        'BQ': '加勒比荷兰',
         'LC': '圣卢西亚',
     };
 
