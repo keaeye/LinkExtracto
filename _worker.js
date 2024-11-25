@@ -112,3 +112,4 @@ function randomSelectHalf(arr) {
     const half = Math.floor(shuffled.length / 2); // 计算一半的数量
     return shuffled.slice(0, half); // 返回前一半
 }
+
