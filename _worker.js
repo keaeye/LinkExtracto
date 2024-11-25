@@ -24,15 +24,6 @@ export default {
     }
 };
 
-const countryMapping = {
-    'HK': 'Hong Kong',
-    'KR': 'South Korea',
-    'TW': 'Taiwan',
-    'JP': 'Japan',
-    'US': 'United States',
-    // 可以继续添加更多映射...
-};
-
 async function fetchLinks(url) {
     let base64Data;
     try {
@@ -66,28 +57,12 @@ function extractLinks(decodedContent) {
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
         const port = match[3];
-        let countryCode = match[5];
+        const countryCode = match[5];
 
-        countryCode = optimizeCountryCode(countryCode);
-
-        if (countryCode) {
-            const formattedLink = `${ip}:${port}#${countryCode}`;
-            links.push(formattedLink);
-        }
+        // 直接使用提取到的国家信息
+        const formattedLink = `${ip}:${port}#${countryCode}`;
+        links.push(formattedLink);
     }
 
     return links;
-}
-
-function optimizeCountryCode(countryCode) {
-    if (countryMapping[countryCode]) {
-        return countryMapping[countryCode];
-    }
-
-    const countryRegex = /^[A-Za-z\s-]+$/;
-    if (countryCode && countryRegex.test(countryCode)) {
-        return countryCode.split(/[^\w\s-]+/)[0];
-    }
-
-    return null;
 }
