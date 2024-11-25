@@ -1,51 +1,53 @@
 export default {
-    async fetch(request, env) {
-        const url = env.URL;
+    async fetch(请求, env) {
+        const urls = env.URL;  // 获取 URL 输入，可能是多行
 
-        if (!url) {
+        if (!urls) {
             return new Response(
                 "You have not set the URL. 请填写 URL 以便提取数据。",
                 {
-                    headers: { 'Content-Type': 'text/plain; charset=utf-8' } 
+                    headers: { 'Content-Type': 'text/plain; charset=utf-8' }
                 }
             );
         }
 
-        const base64Data = await fetch(url).then(res => res.text()).catch(err => {
-            console.error("Failed to fetch the content:", err);
-            return null;
-        });
+        // 将多行 URL 拆分成一个数组
+        const urlList = urls.split('\n').map(url => url.trim()).filter(url => url);
 
-        if (!base64Data) {
-            return new Response("Failed to fetch the data", { status: 500 });
+        if (urlList.length === 0) {
+            return new Response("No valid URLs provided", { status: 400 });
         }
-
-        let decodedContent;
-        try {
-            decodedContent = atob(base64Data);
-        } catch (e) {
-            console.error("Failed to decode the content:", e);
-            return new Response("Failed to decode the content", { status: 500 });
-        }
-
-        // 按行分隔URL
-        const urls = decodedContent.split('\n');
 
         let allLinks = [];
-        
-        // 遍历每个 URL 提取信息
-        for (let url of urls) {
-            if (url.trim() !== '') {  // 忽略空行
-                const links = await extractLinks(url.trim());
-                allLinks = allLinks.concat(links);
+
+        // 对每个 URL 执行提取操作
+        for (const url of urlList) {
+            const base64Data = await fetch(url).then(res => res.text()).catch(err => {
+                console.error("Failed to fetch the content from", url, ":", err);
+                return null;
+            });
+
+            if (!base64Data) {
+                continue;  // 如果获取失败，跳过当前 URL
             }
+
+            let decodedContent;
+            try {
+                decodedContent = atob(base64Data);
+            } catch (e) {
+                console.error("Failed to decode the content from", url, ":", e);
+                continue;  // 如果解码失败，跳过当前 URL
+            }
+
+            const links = extractLinks(decodedContent);
+            allLinks = [...allLinks, ...links];  // 将当前 URL 提取到的链接合并到总链接中
         }
 
         if (allLinks.length === 0) {
             return new Response("No valid links found", { status: 500 });
         }
 
-        const plainTextContent = allLinks.join('\n');
+        const plainTextContent = allLinks.join('\n');  // 将所有链接输出为换行分隔的文本
 
         return new Response(plainTextContent, {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -53,15 +55,12 @@ export default {
     }
 };
 
-async function extractLinks(url) {
-    const response = await fetch(url);
-    const data = await response.text();
-
+function extractLinks(decodedContent) {
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^%]+)%F0%9F%90%B2/g;
     const links = [];
     let match;
 
-    while ((match = regex.exec(data)) !== null) {
+    while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
         const port = match[3];
         let countryCode = decodeURIComponent(match[5]);
