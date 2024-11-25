@@ -30,6 +30,9 @@ export default {
                 continue;
             }
 
+            // Step 2: Decode URL-encoded parts (e.g., %E6%B5%8B%E8%AF%95)
+            decodedContent = decodeURIComponent(decodedContent);
+
             const links = extractLinks(decodedContent);
 
             if (links.length > 0) {
@@ -57,7 +60,7 @@ function extractLinks(decodedContent) {
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
         const port = match[3];
-        let countryCode = decodeURIComponent(match[5]);
+        let countryCode = decodeURIComponent(match[5]); // Ensure the country part is URL-decoded
 
         // 识别国家文字部分
         countryCode = extractCountry(countryCode);
