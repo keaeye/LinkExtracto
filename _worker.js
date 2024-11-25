@@ -53,28 +53,28 @@ function extractLinks(decodedContent) {
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^\n]+)/g;
     const links = [];
     const countryMapping = {
-    "香港": "HK",
-    "韩国": "KR",
-    "台湾": "TW",
-    "日本": "JP",
-    "新加坡": "SG",
-    "美国": "US",
-    "加拿大": "CA",
-    "澳大利亚": "AU",
-    "英国": "GB",
-    "法国": "FR",
-    "意大利": "IT",
-    "荷兰": "NL",
-    "德国": "DE",
-    "挪威": "NO",
-    "芬兰": "FI",
-    "瑞典": "SE",
-    "丹麦": "DK",
-    "立陶宛": "LT",
-    "俄罗斯": "RU",
-    "印度": "IN",
-    "土耳其": "TR"
-};
+        "香港": "HK",
+        "韩国": "KR",
+        "台湾": "TW",
+        "日本": "JP",
+        "新加坡": "SG",
+        "美国": "US",
+        "加拿大": "CA",
+        "澳大利亚": "AU",
+        "英国": "GB",
+        "法国": "FR",
+        "意大利": "IT",
+        "荷兰": "NL",
+        "德国": "DE",
+        "挪威": "NO",
+        "芬兰": "FI",
+        "瑞典": "SE",
+        "丹麦": "DK",
+        "立陶宛": "LT",
+        "俄罗斯": "RU",
+        "印度": "IN",
+        "土耳其": "TR"
+    };
 
     let match;
     while ((match = regex.exec(decodedContent)) !== null) {
