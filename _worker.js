@@ -28,6 +28,7 @@ export default {
             });
 
             if (!base64Data) {
+                console.log(`No valid data from URL: ${url}`);
                 continue;  // 如果获取失败，跳过当前 URL
             }
 
@@ -39,7 +40,11 @@ export default {
                 continue;  // 如果解码失败，跳过当前 URL
             }
 
+            console.log("Decoded content for URL:", url);
+            console.log(decodedContent); // 打印解码后的内容
+
             const links = extractLinks(decodedContent);
+            console.log("Extracted links:", links); // 打印提取到的链接
             allLinks = [...allLinks, ...links];  // 将当前 URL 提取到的链接合并到总链接中
         }
 
