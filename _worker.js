@@ -43,7 +43,7 @@ export default {
         const plainTextContent = links.join('\n');
 
         return new Response(plainTextContent, {
-            headers: { 'Content-Type': 'text/plain' }
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' } // 确保返回 UTF-8 编码
         });
     }
 };
