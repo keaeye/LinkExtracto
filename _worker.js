@@ -75,7 +75,7 @@ function extractLinks(decodedContent) {
         "印度": "印度",
         "土耳其": "土耳其"
     };
-    
+
     let match;
     while ((match = regex.exec(decodedContent)) !== null) {
         const ip = match[2];
@@ -90,8 +90,8 @@ function extractLinks(decodedContent) {
             }
         }
 
-        // 清理掉多余的字符，只保留国家名称
-        countryCode = countryCode.replace(/[^\w\u4e00-\u9fa5]/g, '');
+        // 去除多余字符，保留国家名称
+        countryCode = countryCode.replace(/[^\w\u4e00-\u9fa5]/g, ''); // 去除符号和其他非字母、数字字符
 
         // 获取格式化链接并加上国家代码
         const formattedLink = `${ip}:${port}#${countryCode}`;
