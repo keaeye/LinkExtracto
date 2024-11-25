@@ -65,8 +65,12 @@ function extractLinks(decodedContent) {
         links.push(formattedLink);
     }
 
-    // 排序链接，按 IP 排序
-    links.sort();
+    // 按照国家代码排序
+    links.sort((a, b) => {
+        const countryA = a.split('#')[1]; // 提取第一个链接的国家代码
+        const countryB = b.split('#')[1]; // 提取第二个链接的国家代码
+        return countryA.localeCompare(countryB); // 按字母顺序排序
+    });
 
     // 将排序后的链接中的首行国家代码改为 "Keaeye提供"
     if (links.length > 0) {
