@@ -26,7 +26,7 @@ export default {
             // 不过滤国家，按国家排序并返回所有链接
             selectedLinks = sortLinksByCountry(validLinks);
         } else {
-            // 按国家分组，随机取一半
+            // 按国家分组，随机取一半，排除指定国家
             selectedLinks = selectRandomHalfByCountry(validLinks);
         }
 
@@ -114,13 +114,7 @@ function extractLinks(decodedContent) {
         // 形成格式化的链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
-        // 排除特定国家的代码
-        const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "GB", "AU", "CA", "PL"];
-        
-        // 只保留不在排除列表中的有效国家代码链接
-        if (countryCode && !excludeCountries.includes(countryCode)) {
-            links.push({ link: formattedLink, countryCode: countryCode });
-        }
+        links.push({ link: formattedLink, countryCode: countryCode });
     }
 
     // 过滤无效的链接，确保是有效的 IP 地址格式
@@ -146,21 +140,25 @@ function sortLinksByCountry(links) {
     }).map(link => link.link); // 返回链接而不是对象
 }
 
-// 按新的国家顺序排序链接，并随机选择一半
+// 按新的国家顺序排序链接，并随机选择一半，排除特定国家
 function selectRandomHalfByCountry(links) {
     const countryOrder = [
         "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
         "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
+    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "GB", "AU", "CA", "PL"];
+
     const groupedLinks = {};
 
     // 分组链接
     links.forEach(({ link, countryCode }) => {
-        if (!groupedLinks[countryCode]) {
-            groupedLinks[countryCode] = [];
+        if (!excludeCountries.includes(countryCode)) {
+            if (!groupedLinks[countryCode]) {
+                groupedLinks[countryCode] = [];
+            }
+            groupedLinks[countryCode].push(link);
         }
-        groupedLinks[countryCode].push(link);
     });
 
     // 按国家排序并随机选一半
