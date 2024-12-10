@@ -23,8 +23,8 @@ export default {
 
         let selectedLinks;
         if (isUnfiltered) {
-            // 不过滤国家，直接返回所有有效链接
-            selectedLinks = validLinks.map(({ link }) => link);
+            // 不过滤国家，按国家排序并返回所有链接
+            selectedLinks = sortLinksByCountry(validLinks);
         } else {
             // 按国家分组，随机取一半
             selectedLinks = selectRandomHalfByCountry(validLinks);
@@ -125,6 +125,25 @@ function extractLinks(decodedContent) {
 
     // 过滤无效的链接，确保是有效的 IP 地址格式
     return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
+}
+
+// 按国家排序链接
+function sortLinksByCountry(links) {
+    const countryOrder = [
+        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO",
+        "FI", "SE", "DK", "LT", "RU", "IN", "TR"
+    ];
+
+    // 按国家排序
+    return links.sort((a, b) => {
+        const countryIndexA = countryOrder.indexOf(a.countryCode);
+        const countryIndexB = countryOrder.indexOf(b.countryCode);
+
+        if (countryIndexA === -1) return 1; // 如果没有找到，排在最后
+        if (countryIndexB === -1) return -1;
+
+        return countryIndexA - countryIndexB;
+    }).map(link => link.link); // 返回链接而不是对象
 }
 
 // 按新的国家顺序排序链接，并随机选择一半
