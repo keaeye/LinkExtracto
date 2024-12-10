@@ -104,8 +104,11 @@ function extractLinks(decodedContent) {
         // 形成格式化的链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
-        // 只保留包含有效国家代码的链接
-        if (countryCode && countryCode !== 'PL') {
+        // 排除特定国家的代码
+        const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "GB", "AU", "CA", "PL"];
+        
+        // 只保留不在排除列表中的有效国家代码链接
+        if (countryCode && !excludeCountries.includes(countryCode)) {
             links.push({ link: formattedLink, countryCode: countryCode });
         }
     }
