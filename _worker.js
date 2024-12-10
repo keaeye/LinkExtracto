@@ -9,6 +9,10 @@ export default {
             );
         }
 
+        // 检查是否包含 /KY 参数
+        const url = new URL(request.url);
+        const isUnfiltered = url.pathname.endsWith("/KY");
+
         const allLinks = await Promise.all(urls.map(url => fetchLinks(url)));
 
         const validLinks = allLinks.flat().filter(link => link);
@@ -17,8 +21,14 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
-        // 按国家分组，随机取一半
-        const selectedLinks = selectRandomHalfByCountry(validLinks);
+        let selectedLinks;
+        if (isUnfiltered) {
+            // 不过滤国家，直接返回所有有效链接
+            selectedLinks = validLinks.map(({ link }) => link);
+        } else {
+            // 按国家分组，随机取一半
+            selectedLinks = selectRandomHalfByCountry(validLinks);
+        }
 
         // 替换第一行的 #国家代码 为 #Keaeye提供
         if (selectedLinks.length > 0) {
