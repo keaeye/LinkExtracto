@@ -17,7 +17,7 @@ export default {
 
         // 检查是否包含 /KY 参数
         const url = new URL(request.url);
-        const isUnfiltered = url.pathname.endsWith("/KY");
+        const isUnfiltered = url.pathname.ends以("/KY");
 
         let allLinks;
         try {
@@ -34,8 +34,18 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
-        // 将 LINK 环境变量中的链接添加到结果中
-        let allFinalLinks = [...validLinks, ...linkEnv, ...ipEnv];
+        // 处理 IP 环境变量，解析每个 IP 地址并加到结果中
+        const ipLinks = ipEnv.map(ip => {
+            const [ipPart, countryCode] = ip.split("#");
+            const [ipAddress, port] = ipPart.split(":");
+            if (ipAddress && port && countryCode) {
+                return `${ipAddress}:${port}#${countryCode}`;
+            }
+            return null;
+        }).filter(link => link !== null);
+
+        // 将 LINK 和 IP 环境变量中的链接添加到结果中
+        let allFinalLinks = [...validLinks, ...linkEnv, ...ipLinks];
 
         // 去重链接
         const uniqueLinks = Array.from(new Set(allFinalLinks));
