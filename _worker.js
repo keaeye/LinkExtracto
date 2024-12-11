@@ -274,54 +274,46 @@ function sortLinksByCountry(links) {
     }).map(link => link.link); // 返回链接而不是对象
 }
 
-// 按新的国家顺序排序链接，并随机选择一半，排除特定国家
-function selectRandomHalfByCountry(links) {
-    const countryOrder = [
-        "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
-    ];
+// 按新的国家顺序排序链接，并随机选择每个国家的5个链接，排除特定国家
+function selectRandomFiveByCountry(links) {
+    const countryOrder = [
+        "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
+    ];
 
-    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL"];
+    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL"];
 
-    const groupedLinks = {};
+    const groupedLinks = {};
 
-    // 分组链接
-    links.forEach(({ link, countryCode }) => {
-        if (!excludeCountries.includes(countryCode)) {
-            if (!groupedLinks[countryCode]) {
-                groupedLinks[countryCode] = [];
-            }
-            groupedLinks[countryCode].push(link);
-        }
-    });
+    // 分组链接
+    links.forEach(({ link, countryCode }) => {
+        if (!excludeCountries.includes(countryCode)) {
+            if (!groupedLinks[countryCode]) {
+                groupedLinks[countryCode] = [];
+            }
+            groupedLinks[countryCode].push(link);
+        }
+    });
 
- // 按国家排序并随机选择每个国家的5个链接
-const result = [];
-countryOrder.forEach(country => {
-    if (groupedLinks[country]) {
-        const linksForCountry = groupedLinks[country];
-        
-        // 随机选择每个国家的前5个链接
-        const selectedLinks = shuffleArray(linksForCountry).slice(0, 5);
-        result.push(...selectedLinks);
-    }
-});
+    // 按国家排序并随机选择每个国家的5个链接
+    const result = [];
+    countryOrder.forEach(country => {
+        if (groupedLinks[country]) {
+            const linksForCountry = groupedLinks[country];
 
-return result;
+            // 随机选择每个国家的前5个链接
+            const selectedLinks = shuffleArray(linksForCountry).slice(0, 5);
+            result.push(...selectedLinks);
+        }
+    });
 
-            // 随机选择
-            const selectedLinks = shuffleArray(linksForCountry).slice(0, halfCount);
-            result.push(...selectedLinks);
-        }
-    });
-
-    return result;
+    return result;
 }
 
 // 洗牌算法随机打乱数组
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
