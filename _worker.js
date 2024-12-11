@@ -294,12 +294,19 @@ function selectRandomHalfByCountry(links) {
         }
     });
 
-    // 按国家排序并随机选一半
-    const result = [];
-    countryOrder.forEach(country => {
-        if (groupedLinks[country]) {
-            const linksForCountry = groupedLinks[country];
-            const halfCount = Math.ceil(linksForCountry.length / 2);
+ // 按国家排序并随机选择每个国家的5个链接
+const result = [];
+countryOrder.forEach(country => {
+    if (groupedLinks[country]) {
+        const linksForCountry = groupedLinks[country];
+        
+        // 随机选择每个国家的前5个链接
+        const selectedLinks = shuffleArray(linksForCountry).slice(0, 5);
+        result.push(...selectedLinks);
+    }
+});
+
+return result;
 
             // 随机选择
             const selectedLinks = shuffleArray(linksForCountry).slice(0, halfCount);
