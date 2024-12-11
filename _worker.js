@@ -115,14 +115,14 @@ function extractLinks(decodedContent) {
         // 形成格式化的链接
         const formattedLink = `${ip}:${port}#${countryCode}`;
 
-        links.push({ link: formattedLink, countryCode: countryCode });
+        links.push(formattedLink);  // 返回链接而非对象
     }
 
     // 过滤无效的链接，确保是有效的 IP 地址格式
-    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
+    return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.split('#')[0]));
 }
 
-// 按国家排序链接
+// 返回只包含字符串的链接
 function sortLinksByCountry(links) {
     const countryOrder = [
         "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
@@ -130,17 +130,17 @@ function sortLinksByCountry(links) {
 
     // 按国家排序
     return links.sort((a, b) => {
-        const countryIndexA = countryOrder.indexOf(a.countryCode);
-        const countryIndexB = countryOrder.indexOf(b.countryCode);
+        const countryIndexA = countryOrder.indexOf(a.split("#")[1]);
+        const countryIndexB = countryOrder.indexOf(b.split("#")[1]);
 
         if (countryIndexA === -1) return 1; // 如果没有找到，排在最后
         if (countryIndexB === -1) return -1;
 
         return countryIndexA - countryIndexB;
-    }).map(link => link.link); // 返回链接而不是对象
+    });
 }
 
-// 按新的国家顺序排序链接，并随机选择每个国家的5个链接，排除特定国家
+// 过滤和返回纯链接
 function selectRandomFiveByCountry(links) {
     const countryOrder = [
         "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
@@ -151,7 +151,8 @@ function selectRandomFiveByCountry(links) {
     const groupedLinks = {};
 
     // 分组链接
-    links.forEach(({ link, countryCode }) => {
+    links.forEach(link => {
+        const countryCode = link.split("#")[1];
         if (!excludeCountries.includes(countryCode)) {
             if (!groupedLinks[countryCode]) {
                 groupedLinks[countryCode] = [];
