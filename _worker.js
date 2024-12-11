@@ -1,23 +1,28 @@
 export default {
     async fetch(request, env) {
-        const urls = (env.URL || "").split("\n").map(url => url.trim()).filter(url => url !== "");
+        // 调试输出环境变量
+        console.log("env.URL:", env.URL);
+        console.log("env.LINK:", env.LINK);
+        console.log("env.IP:", env.IP);
 
+        // 获取提供的 URLs
+        const urls = (env.URL || "").split("\n").map(url => url.trim()).filter(url => url !== "");
         if (urls.length === 0) {
-            return new Response(
-                "You have not set any URLs. Please provide URLs to fetch data.\n",
-                { headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
-            );
+            return new Response("You have not set any URLs. Please provide URLs to fetch data.\n", {
+                headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+            });
         }
 
         // 获取 Cloudflare Pages 环境变量 LINK 的值
         const linkEnv = (env.LINK || "").split("\n").map(link => link.trim()).filter(link => link !== "");
-        
+
         // 获取 Cloudflare Pages 环境变量 IP 的值
         const ipEnv = (env.IP || "").split("\n").map(ip => ip.trim()).filter(ip => ip !== "");
 
         // 检查是否包含 /KY 参数
         const url = new URL(request.url);
-        const isUnfiltered = url.pathname.ends以("/KY");
+        const isUnfiltered = url.pathname.endsWith("/KY");
+        console.log("isUnfiltered:", isUnfiltered);  // Debug output
 
         let allLinks;
         try {
