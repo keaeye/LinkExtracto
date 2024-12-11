@@ -277,7 +277,7 @@ function sortLinksByCountry(links) {
 // 按新的国家顺序排序链接，并随机选择一半，排除特定国家
 function selectRandomHalfByCountry(links) {
     const countryOrder = [
-        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
+        "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
     const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL"];
