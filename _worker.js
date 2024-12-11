@@ -275,7 +275,7 @@ function sortLinksByCountry(links) {
 }
 
 // 按新的国家顺序排序链接，并随机选择一半，排除特定国家
-function selectRandomHalfByCountry(links) {
+function selectRandomFiveByCountry(links) {
     const countryOrder = [
         "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
@@ -294,15 +294,15 @@ function selectRandomHalfByCountry(links) {
         }
     });
 
-    // 按国家排序并随机选一半
+    // 按国家排序并随机选5个链接
     const result = [];
     countryOrder.forEach(country => {
         if (groupedLinks[country]) {
             const linksForCountry = groupedLinks[country];
-            const halfCount = Math.ceil(linksForCountry.length / 2);
+            const fiveCount = 5;  // 修改为固定选择5个链接
 
-            // 随机选择
-            const selectedLinks = shuffleArray(linksForCountry).slice(0, halfCount);
+            // 随机选择5个链接
+            const selectedLinks = shuffleArray(linksForCountry).slice(0, fiveCount);
             result.push(...selectedLinks);
         }
     });
