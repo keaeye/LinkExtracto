@@ -158,8 +158,9 @@ function selectRandomFiveByCountry(links) {
         if (groupedLinks[country]) {
             const linksForCountry = groupedLinks[country];
 
-            // 随机选择每个国家的前5个链接，并去重
-            const selectedLinks = shuffleArray(linksForCountry).slice(0, 5);
+            // 先去重，然后随机选择每个国家的前5个链接
+            const uniqueLinks = Array.from(new Set(linksForCountry));
+            const selectedLinks = shuffleArray(uniqueLinks).slice(0, 5);
             selectedLinks.forEach(link => {
                 if (!result.includes(link)) {
                     result.push(link);
