@@ -11,6 +11,9 @@ export default {
 
         // 获取 Cloudflare Pages 环境变量 LINK 的值
         const linkEnv = (env.LINK || "").split("\n").map(link => link.trim()).filter(link => link !== "");
+        
+        // 获取 Cloudflare Pages 环境变量 IP 的值
+        const ipEnv = (env.IP || "").split("\n").map(ip => ip.trim()).filter(ip => ip !== "");
 
         // 检查是否包含 /KY 参数
         const url = new URL(request.url);
@@ -32,7 +35,7 @@ export default {
         }
 
         // 将 LINK 环境变量中的链接添加到结果中
-        let allFinalLinks = [...validLinks, ...linkEnv];
+        let allFinalLinks = [...validLinks, ...linkEnv, ...ipEnv];
 
         // 去重链接
         const uniqueLinks = Array.from(new Set(allFinalLinks));
