@@ -19,6 +19,14 @@ export default {
         // 获取 Cloudflare Pages 环境变量 IP 的值
         const ipEnv = (env.IP || "").split("\n").map(ip => ip.trim()).filter(ip => ip !== "");
 
+        // 输出 IP 环境变量内容
+        console.log("Parsed IP environment variable:", ipEnv);
+
+        // 检查是否有 IP 地址
+        if (ipEnv.length === 0) {
+            return new Response("No IP addresses found in the environment variable.\n", { status: 500 });
+        }
+
         // 检查是否包含 /KY 参数
         const url = new URL(request.url);
         const isUnfiltered = url.pathname.endsWith("/KY");
@@ -42,12 +50,15 @@ export default {
         // 处理 IP 环境变量，解析每个 IP 地址并加到结果中
         const ipLinks = ipEnv.map(ip => {
             const [ipPart, countryCode] = ip.split("#");
+            console.log("IP Part:", ipPart, "CountryCode:", countryCode);  // Debug output
             const [ipAddress, port] = ipPart.split(":");
             if (ipAddress && port && countryCode) {
                 return `${ipAddress}:${port}#${countryCode}`;
             }
             return null;
         }).filter(link => link !== null);
+
+        console.log("Processed IP links:", ipLinks);  // Debug output
 
         // 将 LINK 和 IP 环境变量中的链接添加到结果中
         let allFinalLinks = [...validLinks, ...linkEnv, ...ipLinks];
