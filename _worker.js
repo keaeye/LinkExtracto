@@ -27,13 +27,16 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
+        // 去重链接
+        const uniqueLinks = Array.from(new Set(validLinks));
+
         let selectedLinks;
         if (isUnfiltered) {
             // 不过滤国家，按国家排序并返回所有链接
-            selectedLinks = sortLinksByCountry(validLinks);
+            selectedLinks = sortLinksByCountry(uniqueLinks);
         } else {
             // 按国家分组，随机取一半，排除指定国家
-            selectedLinks = selectRandomFiveByCountry(validLinks);
+            selectedLinks = selectRandomFiveByCountry(uniqueLinks);
         }
 
         // 替换第一行的 #国家代码 为 #Keaeye提供
