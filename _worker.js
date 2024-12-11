@@ -1,81 +1,3 @@
-export default {
-    async fetch(request, env) {
-        // 获取提供的 URLs
-        const urls = (env.URL || "").split("\n").map(url => url.trim()).filter(url => url !== "");
-        if (urls.length === 0) {
-            return new Response("You have not set any URLs. Please provide URLs to fetch data.\n", {
-                headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-            });
-        }
-
-        // 获取 Cloudflare Pages 环境变量 LINK 的值
-        const linkEnv = (env.LINK || "").split("\n").map(link => link.trim()).filter(link => link !== "");
-
-        // 获取 Cloudflare Pages 环境变量 IP 的值
-        const ipEnv = (env.IP || "").split("\n").map(ip => ip.trim()).filter(ip => ip !== "");
-
-        // 检查是否有 IP 地址
-        if (ipEnv.length === 0) {
-            return new Response("No IP addresses found in the environment variable.\n", { status: 500 });
-        }
-
-        // 检查是否包含 /KY 参数
-        const url = new URL(request.url);
-        const isUnfiltered = url.pathname.endsWith("/KY");
-
-        let allLinks;
-        try {
-            // 获取 vless 链接
-            allLinks = await Promise.all(urls.map(url => fetchLinks(url)));
-        } catch (err) {
-            console.error("Error fetching links:", err);
-            return new Response("Failed to fetch links from provided URLs.", { status: 500 });
-        }
-
-        const validLinks = allLinks.flat().filter(link => link);
-
-        if (validLinks.length === 0) {
-            return new Response("No valid links found.\n", { status: 500 });
-        }
-
-        // 处理 IP 环境变量，解析每个 IP 地址并加到结果中
-        const ipLinks = ipEnv.map(ip => {
-            const [ipPart, countryCode] = ip.split("#");
-            const [ipAddress, port] = ipPart.split(":");
-            if (ipAddress && port && countryCode) {
-                return `${ipAddress}:${port}#${countryCode}`;
-            }
-            return null;
-        }).filter(link => link !== null);
-
-        // 将 LINK 和 IP 环境变量中的链接添加到结果中
-        let allFinalLinks = [...validLinks, ...linkEnv, ...ipLinks];
-
-        // 去重链接
-        const uniqueLinks = Array.from(new Set(allFinalLinks));
-
-        let selectedLinks;
-        if (isUnfiltered) {
-            // 不过滤国家，按国家排序并返回所有链接
-            selectedLinks = sortLinksByCountry(uniqueLinks);
-        } else {
-            // 按国家分组，随机取一半，排除指定国家
-            selectedLinks = selectRandomFiveByCountry(uniqueLinks);
-        }
-
-        // 替换第一行的 #国家代码 为 #Keaeye提供
-        if (selectedLinks.length > 0) {
-            selectedLinks[0] = selectedLinks[0].replace(/#\w+$/, "#Keaeye提供");
-        }
-
-        const plainTextContent = selectedLinks.join('\n');
-        return new Response(plainTextContent + "\n", {
-            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-        });
-    }
-};
-
-// 从 URL 中提取 IP 和端口
 async function fetchLinks(url) {
     let base64Data;
     try {
@@ -98,6 +20,13 @@ async function fetchLinks(url) {
     }
 
     decodedContent = decodeURIComponent(decodedContent);
+
+    // 如果解码后的内容看起来像是一个 JavaScript 函数（即包含 `function link() { [native code] }`），则说明解析失败
+    if (decodedContent.includes("function link() { [native code] }")) {
+        console.error("Decoded content appears to be invalid JavaScript code.");
+        return [];
+    }
+
     return extractLinks(decodedContent);
 }
 
@@ -109,7 +38,7 @@ function extractLinks(decodedContent) {
         "加拿大": "CA", "澳大利亚": "AU", "英国": "GB", "法国": "FR", "意大利": "IT", "荷兰": "NL",
         "德国": "DE", "挪威": "NO", "芬兰": "FI", "瑞典": "SE", "丹麦": "DK", "立陶宛": "LT", "俄罗斯": "RU",
         "印度": "IN", "土耳其": "TR", "阿根廷": "AR", "巴西": "BR", "墨西哥": "MX", "南非": "ZA", "新西兰": "NZ",
-        "西班牙": "ES", "瑞士": "CH", "比利时": "BE", "奥地利": "AT", "爱尔兰": "IE", "葡萄牙": "PT"
+        "西班牙": "ES", "葡萄牙": "PT", "瑞士": "CH", "比利时": "BE", "奥地利": "AT", "爱尔兰": "IE", "葡萄牙": "PT"
     };
 
     let match;
@@ -137,71 +66,4 @@ function extractLinks(decodedContent) {
 
     // 过滤无效的链接，确保是有效的 IP 地址格式
     return links.filter(link => /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(link.link.split('#')[0]));
-}
-
-// 按国家排序链接
-function sortLinksByCountry(links) {
-    const countryOrder = [
-        "US", "KR", "TW", "JP", "SG", "HK", "CA", "AU", "GB", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
-    ];
-
-    // 按国家排序
-    return links.sort((a, b) => {
-        const countryIndexA = countryOrder.indexOf(a.countryCode);
-        const countryIndexB = countryOrder.indexOf(b.countryCode);
-
-        if (countryIndexA === -1) return 1; // 如果没有找到，排在最后
-        if (countryIndexB === -1) return -1;
-
-        return countryIndexA - countryIndexB;
-    }).map(link => link.link); // 返回链接而不是对象
-}
-
-// 按新的国家顺序排序链接，并随机选择每个国家的5个链接，排除特定国家
-function selectRandomFiveByCountry(links) {
-    const countryOrder = [
-        "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
-    ];
-
-    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL"];
-
-    const groupedLinks = {};
-
-    // 分组链接
-    links.forEach(({ link, countryCode }) => {
-        if (!excludeCountries.includes(countryCode)) {
-            if (!groupedLinks[countryCode]) {
-                groupedLinks[countryCode] = [];
-            }
-            groupedLinks[countryCode].push(link);
-        }
-    });
-
-    // 按国家排序并随机选择每个国家的5个链接
-    const result = [];
-    countryOrder.forEach(country => {
-        if (groupedLinks[country]) {
-            const linksForCountry = groupedLinks[country];
-
-            // 先去重，然后随机选择每个国家的前5个链接
-            const uniqueLinks = Array.from(new Set(linksForCountry));
-            const selectedLinks = shuffleArray(uniqueLinks).slice(0, 5);
-            selectedLinks.forEach(link => {
-                if (!result.includes(link)) {
-                    result.push(link);
-                }
-            });
-        }
-    });
-
-    return result;
-}
-
-// 洗牌算法随机打乱数组
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
