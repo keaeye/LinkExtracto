@@ -9,12 +9,16 @@ export default {
             );
         }
 
+        // 获取 Cloudflare Pages 环境变量 LINK 的值
+        const linkEnv = (env.LINK || "").split("\n").map(link => link.trim()).filter(link => link !== "");
+
         // 检查是否包含 /KY 参数
         const url = new URL(request.url);
         const isUnfiltered = url.pathname.endsWith("/KY");
 
         let allLinks;
         try {
+            // 获取 vless 链接
             allLinks = await Promise.all(urls.map(url => fetchLinks(url)));
         } catch (err) {
             console.error("Error fetching links:", err);
@@ -27,22 +31,8 @@ export default {
             return new Response("No valid links found.\n", { status: 500 });
         }
 
-        // 添加静态链接 LINK，链接内容为 URL
-        const LINK = [
-            "https://example.com/1", // 用真实的URL替换
-            "https://example.com/2",
-            "https://example.com/3"
-            // ... 添加更多链接
-        ];
-
-        // 将静态链接与解析出来的链接合并
-        let allFinalLinks = [...validLinks];
-        for (let link of LINK) {
-            const linkData = await fetchLinkData(link); // 从 URL 中获取数据
-            if (linkData) {
-                allFinalLinks = [...allFinalLinks, ...linkData];
-            }
-        }
+        // 将 LINK 环境变量中的链接添加到结果中
+        let allFinalLinks = [...validLinks, ...linkEnv];
 
         // 去重链接
         const uniqueLinks = Array.from(new Set(allFinalLinks));
@@ -69,27 +59,7 @@ export default {
 };
 
 // 从 URL 中提取 IP 和端口
-async function fetchLinkData(url) {
-    let ipPortData = [];
-    try {
-        const response = await fetch(url);
-        const text = await response.text();
-        // 假设URL中的文本是 "IP:Port#Country"
-        const regex = /(\d+\.\d+\.\d+\.\d+):(\d+)#([A-Za-z]+)/g;
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-            const ip = match[1];
-            const port = match[2];
-            const countryCode = match[3];
-            ipPortData.push(`${ip}:${port}#${countryCode}`);
-        }
-    } catch (err) {
-        console.error(`Failed to fetch from ${url}:`, err);
-    }
-    return ipPortData;
-}
-
-function fetchLinks(url) {
+async function fetchLinks(url) {
     let base64Data;
     try {
         base64Data = await fetch(url).then(res => res.text());
@@ -196,11 +166,25 @@ function selectRandomFiveByCountry(links) {
         if (groupedLinks[country]) {
             const linksForCountry = groupedLinks[country];
 
-            // 先去重，然后随机选择每个国家的前5
-            const randomLinks = linksForCountry.slice(0, 5);
-            result.push(...randomLinks);
+            // 先去重，然后随机选择每个国家的前5个链接
+            const uniqueLinks = Array.from(new Set(linksForCountry));
+            const selectedLinks = shuffleArray(uniqueLinks).slice(0, 5);
+            selectedLinks.forEach(link => {
+                if (!result.includes(link)) {
+                    result.push(link);
+                }
+            });
         }
     });
 
     return result;
+}
+
+// 洗牌算法随机打乱数组
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
