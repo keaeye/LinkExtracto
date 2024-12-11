@@ -158,9 +158,13 @@ function selectRandomFiveByCountry(links) {
         if (groupedLinks[country]) {
             const linksForCountry = groupedLinks[country];
 
-            // 随机选择每个国家的前5个链接
+            // 随机选择每个国家的前5个链接，并去重
             const selectedLinks = shuffleArray(linksForCountry).slice(0, 5);
-            result.push(...selectedLinks);
+            selectedLinks.forEach(link => {
+                if (!result.includes(link)) {
+                    result.push(link);
+                }
+            });
         }
     });
 
