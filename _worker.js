@@ -60,27 +60,30 @@ export default {
 
 // 从 URL 中提取 IP 和端口
 async function fetchLinks(url) {
-    let response;
+    let base64Data;
     try {
-        response = await fetch(url);
-        if (!response.ok) {
-            console.error(`Failed to fetch from ${url}: ${response.statusText}`);
-            return [];
-        }
+        base64Data = await fetch(url).then(res => res.text());
     } catch (err) {
         console.error(`Failed to fetch from ${url}:`, err);
         return [];
     }
 
-    const linkContent = await response.text();
-    if (!linkContent) {
+    if (!base64Data) {
         return [];
     }
 
-    return linkContent.split('\n').map(line => line.trim()).filter(line => line);
+    let decodedContent;
+    try {
+        decodedContent = atob(base64Data);
+    } catch (e) {
+        console.error("Failed to decode the content:", e);
+        return [];
+    }
+
+    decodedContent = decodeURIComponent(decodedContent);
+    return extractLinks(decodedContent);
 }
 
-// 从 vless 链接中提取 IP 和端口
 function extractLinks(decodedContent) {
     const regex = /vless:\/\/([a-zA-Z0-9\-]+)@([^:]+):(\d+)\?([^#]+)#([^\n]+)/g;
     const links = [];
@@ -143,7 +146,7 @@ function selectRandomFiveByCountry(links) {
         "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
-    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "AU", "CA", "TW"];
+    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL"];
 
     const groupedLinks = {};
 
