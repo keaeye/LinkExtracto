@@ -146,7 +146,7 @@ function selectRandomFiveByCountry(links) {
         "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
-    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL"];
+    const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "FR", "AU", "CA", "PL", "FR"];
 
     const groupedLinks = {};
 
