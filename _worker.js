@@ -143,7 +143,7 @@ function sortLinksByCountry(links) {
 // 过滤和返回纯链接
 function selectRandomFiveByCountry(links) {
     const countryOrder = [
-        "US", "KR", "JP", "SG", "HK", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
+        "US", "HK", "JP", "KR", "SG", "CA", "AU", "GB", "TW", "FR", "IT", "NL", "DE", "NO", "FI", "SE", "DK", "LT", "RU", "IN", "TR"
     ];
 
     const excludeCountries = ["TR", "RU", "LT", "DK", "SE", "FI", "NO", "DE", "NL", "IT", "TW", "AU", "CA", "PL"];
